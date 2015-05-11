@@ -478,23 +478,24 @@ static NSUInteger _numProcessors;
 
     while (numClasses == 0) {
 
-        numClasses = (NSUInteger)MAX(objc_getClassList(NULL, 0), 0);
+        numClasses = (NSUInteger) MAX(objc_getClassList(NULL, 0), 0);
 
         // numClasses now tells us how many classes we have (but it might change)
         // So we can allocate our buffer, and get pointers to all the class definitions.
 
         NSUInteger bufferSize = numClasses;
 
-        classes = numClasses ? (Class *)malloc(sizeof(Class) * bufferSize) : NULL;
+        classes = numClasses ? (Class *) malloc(sizeof(Class) * bufferSize) : NULL;
         if (classes == NULL) {
             return nil; //no memory or classes?
         }
 
-        numClasses = (NSUInteger)MAX(objc_getClassList(classes, (int)bufferSize),0);
+        numClasses = (NSUInteger) MAX(objc_getClassList(classes, (int) bufferSize), 0);
 
         if (numClasses > bufferSize || numClasses == 0) {
             //apparently more classes added between calls (or a problem); try again
             free(classes);
+            classes = nil;
             numClasses = 0;
         }
     }
@@ -503,15 +504,17 @@ static NSUInteger _numProcessors;
 
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:numClasses];
 
-    for (NSUInteger i = 0; i < numClasses; i++) {
-        Class class = classes[i];
 
-        if ([self isRegisteredClass:class]) {
-            [result addObject:class];
+    if (classes) {
+        for (NSUInteger i = 0; i < numClasses; i++) {
+            Class class = classes[i];
+
+            if ([self isRegisteredClass:class]) {
+                [result addObject:class];
+            }
         }
+        free(classes);
     }
-
-    free(classes);
 
     return result;
 }

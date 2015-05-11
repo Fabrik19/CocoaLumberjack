@@ -243,7 +243,7 @@ unsigned long long const kDDDefaultLogFilesDiskQuota   = 20 * 1024 * 1024; // 20
 #if TARGET_OS_IPHONE
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *baseDir = paths.firstObject;
-    NSString *logsDirectory = [baseDir stringByAppendingPathComponent:@"Logs"];
+    NSString *logsDirectory = baseDir ? [baseDir stringByAppendingPathComponent:@"Logs"] : NSTemporaryDirectory();
 
 #else
     NSString *appName = [[NSProcessInfo processInfo] processName];
